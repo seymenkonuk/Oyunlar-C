@@ -4,7 +4,7 @@
 main() {
     getch();
     while (1) {
-        oynaArtiEksiOyunu();
+        oynaArtiEksiOyunu(true);
         while (getch() != '\r');
     }
 }
