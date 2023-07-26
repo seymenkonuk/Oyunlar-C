@@ -16,9 +16,9 @@ int oynaSozcukOyunu(int harf, bool zorMod);
 
 int oynaSozcukOyunu(int harf, bool zorMod) {
     // Türkçe Karakter 
-    int dosyaHarflerTR[29] = {};
-    int terminalKHarfler[29] = {0};
-    int terminalBHarfler[29] = {0};
+    int dosyaHarflerTR[29];
+    int terminalKHarfler[29];
+    int terminalBHarfler[29];
     int i, karakter = 'A';
     for (i=1; i<=29; i++) {
         if (i==4 || i==9 || i==12 || i==19 || i==23 || i==26) continue;
@@ -69,12 +69,13 @@ int oynaSozcukOyunu(int harf, bool zorMod) {
     int tahminYap(int adet, char dizi[adet][harf+1]) {
         int i, j, index = 0, kontrol = 0;
         char kelime[harf+1];  kelime[harf] = '\0';
-        int kacTaneHarf[29]; for (i=0; i<29; i++) kacTaneHarf[i] = 0;
+        int kacTaneHarf[29] = {0};
         
         while (1) {
             char karakter = getch();
             int karakterDegeri = kacinciHarfTerminal(karakter);
             
+            // VARSA HATA MESAJINI SÝLER
             for (i=0; i<kontrol; i++) printf(" ");
             for (i=0; i<kontrol; i++) printf("%c", 8);
             kontrol = 0;
@@ -90,10 +91,10 @@ int oynaSozcukOyunu(int harf, bool zorMod) {
                 if (index == harf) {
                     int sonuc; bool ayniMi;
                     for (i=0; i<adet; i++) {
-                            ayniMi = true;
-                            for (j=0; j<harf; j++) if (dizi[i][j] != kelime[j]) ayniMi = false;
-                            if (ayniMi) {sonuc = i; break;}
-                        }
+                        ayniMi = true;
+                        for (j=0; j<harf; j++) if (dizi[i][j] != kelime[j]) {ayniMi = false; break;}
+                        if (ayniMi) {sonuc = i; break;}
+                    }
                     
                     if (ayniMi) { // Kelimeler Listesinde Var Mý
                         bool kurallaraUygunMu = true;
@@ -139,7 +140,7 @@ int oynaSozcukOyunu(int harf, bool zorMod) {
     }
     
     int seed = ((time(NULL) / 60) / 60) / 24; srand(seed*10000);
-    
+    system("cls");
     bilgilendirmeMetni();
     int adet = kelimeleriOku(1, NULL);
     if (adet == -1) { printf("Kelime Dosyasi Bulunamadi!\n"); return -1;}
@@ -157,36 +158,47 @@ int oynaSozcukOyunu(int harf, bool zorMod) {
             return i;
         }
         // Tahminin Cevabýný Ver
+        // Simetrik Durmasý Ýçin Yeterince Boþluk Ekle
         int j, k; for (j=0; j<24; j++) printf(" ");
         for (j=i; j/10!=0; j/=10) printf(" ");
-        char cevap[harf+1]; cevap[harf] = '\0';
-        bool kullanildiMi[harf]; 
-        for (j=0; j<harf; j++) kullanildiMi[j] = false;
-        for (j=0; j<harf; j++) cevap[j] = '-';
+        
+        char cevap[harf+1]; for (j=0; j<harf; j++) cevap[j] = '-'; cevap[harf] = '\0';
+        bool kullanildiMi[harf]; for (j=0; j<harf; j++) kullanildiMi[j] = false;
+        
+        // Artýlarý Bul
         for (j=0; j<harf; j++) 
-            if (kelimeler[dogruKelime][j] == kelimeler[tahmin][j]) {
+            if (kelimeler[tahmin][j] == kelimeler[dogruKelime][j]) {
                 kullanildiMi[j] = true;
                 cevap[j] = '+';
                 dogrular[j] = kelimeler[dogruKelime][j];
             }
-        for (j=0; j<harf; j++) 
+        
+        // Yýldýzlarý Bul
+        for (j=0; j<harf; j++) {
+            if (cevap[j] == '+') continue;
             for (k=0; k<harf; k++)  {
-                if (j==k || kullanildiMi[k]) continue;
-                if (kelimeler[dogruKelime][k] == kelimeler[tahmin][j]) {
+                if (kullanildiMi[k]) continue;
+                if (kelimeler[tahmin][j] == kelimeler[dogruKelime][k]) {
                     kullanildiMi[k] = true;
                     cevap[j] = '*';
+                    break;
                 }
             }
+        }
+        
+        // Zor Mod ise En Az ve En Fazla Kullanýlabilecek Harfleri Güncelle
         if (zorMod) {
             for (j=0; j<harf; j++) {
                 int kacTane = 0;
+                
                 for (k=0; k<harf; k++)
                     if (kelimeler[tahmin][j] == kelimeler[tahmin][k] && cevap[k] != '-')
                         kacTane++;
+                
+                
+                enAzKacTaneHarf[kacinciHarfDosya(kelimeler[tahmin][j])] = kacTane;
                 if (cevap[j] == '-')
                     enFazlaKacTaneHarf[kacinciHarfDosya(kelimeler[tahmin][j])] = kacTane;
-                else 
-                    enAzKacTaneHarf[kacinciHarfDosya(kelimeler[tahmin][j])] = kacTane;
             }
         }
         printf("%s\n", cevap);
