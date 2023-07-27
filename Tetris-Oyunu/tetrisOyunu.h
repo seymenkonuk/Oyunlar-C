@@ -71,7 +71,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
     int yedekBlok = -1; bool degistirilebilirMi=true; // HOLD
     int gelecekBlok[3]; for (i=0; i<3; i++) gelecekBlok[i] = rastgeleAralik(0, blokSayisi-1);
     int yeniBlok, merkezx, merkezy, yon;
-    int yercekimi, yercekimiHiz = 15;
+    int yercekimi, yercekimiHiz = 15, maxYercekimiHiz = 3; int hizlanma = 0;
     
     // Yazýlarý Yazma
     gotoxy((genislik+2)*2+2, 0);
@@ -225,12 +225,18 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                             printf(" ");
                         }
                 
+                // Oyun Hýzlansýn
+                hizlanma++;
+                if (hizlanma == 5) {
+                    hizlanma = 0;
+                    if (yercekimiHiz > maxYercekimiHiz) yercekimiHiz--;
+                }
                 break;
             }
             
             
             // Bir Birim Aþaðý Kaydýr (YERÇEKÝMÝ)
-            if (yercekimi == yercekimiHiz) {
+            if (yercekimi >= yercekimiHiz) {
                 yercekimi = 0;
                 
                 // Düþme Bitti Mi
