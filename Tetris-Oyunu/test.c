@@ -4,8 +4,7 @@
 main() {
     getch();
     while (1) {
-        oynaTetrisOyunu(10, 20);
-        printf("Bitti!");
+        printf("Bitti!\nPuanin: %d", oynaTetrisOyunu(10, 20));
         while (getch() != '\r');
     }
 }

@@ -12,6 +12,14 @@ int oynaTetrisOyunu(int genislik, int yukseklik);
 
 int oynaTetrisOyunu(int genislik, int yukseklik) {
     int hiz = 60; int puan = 0;
+    void skorDegistir(int artis) {
+        puan += artis;
+        // Ekranda Göster
+        gotoxy((genislik+2)*2+2+6,14);
+        printf("%d", puan);
+        gotoxy(0, yukseklik+2);
+    }
+    
     // Tahtayı Oluşturma
     system("cls"); int i, j;
     for (i=0; i<genislik+2; i++) printf("%c ", 254);
@@ -78,6 +86,10 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
     printf("Yedek");
     gotoxy((genislik+2)*2+2, 4);
     printf("Siradakiler");
+    // Puanı Göster
+    gotoxy((genislik+2)*2+2,14);
+    printf("Puan: ");
+    skorDegistir(0);
     
     // Oyun Mekanikleri
     while (1) {
@@ -106,11 +118,13 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
             yercekimi++;
             // Hareketler
             bool yedeklendiMi = false; // C Tuşuna Basıldı Mı
+            bool boslukBasildiMi = false;
             int kx=0, ky=0, kyon=0, depo=0;
             if (kbhit()) {
                 char tus = getch();
                 if (tus=='s' || tus=='S') {
                     ky=1;
+                    skorDegistir(1);
                 } else if (tus=='a' || tus=='A') {
                     kx=-1;
                 } else if (tus=='d' || tus=='D') {
@@ -134,6 +148,9 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                         gotoxy((genislik+2)*2+4 + bloklar[yedekBlok][0][i][0]*2, 1 + bloklar[yedekBlok][0][i][1]);
                         printf("%c", 254);
                     }
+                } else if (tus==32) { // Boşluk Tuşu, En Aşağı Gönder
+                    ky = 1;
+                    boslukBasildiMi = true;
                 }
             }
             
@@ -153,18 +170,22 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 continue;
             }
             
-            // Hareket Yapılabilir Mi
-            merkezx += kx; merkezy += ky; yon = (yon + kyon+4) % 4;
-            for (i=0; i<4; i++) {
-                int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
-                int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
-                if (parca_x<=0) break; if (parca_x>=genislik+1) break;
-                if (parca_y<=0) continue;
-                if (tahta[parca_y][parca_x] == 1) break;
-            }
-            if (i<4) { // Yapılamazsa Geri Getir
-                merkezx -= kx; merkezy -= ky; yon = (yon - kyon+4)%4;
-            }
+            do {
+                // Hareket Yapılabilir Mi
+                merkezx += kx; merkezy += ky; yon = (yon + kyon+4) % 4;
+                for (i=0; i<4; i++) {
+                    int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
+                    int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
+                    if (parca_x<=0) break; if (parca_x>=genislik+1) break;
+                    if (parca_y<=0) continue;
+                    if (tahta[parca_y][parca_x] == 1) break;
+                }
+                if (i<4) { // Yapılamazsa Geri Getir
+                    merkezx -= kx; merkezy -= ky; yon = (yon - kyon+4)%4;
+                    break;
+                }
+                if (boslukBasildiMi) skorDegistir(2);
+            } while (boslukBasildiMi);
             
             // Yenisini Göster
             for (i=0; i<4; i++) {
@@ -199,9 +220,11 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 
                 // SATIR DOLDUYSA SATIRI SİL
                 int depoTahta[yukseklik+2][genislik+2]; for (i=0; i<yukseklik+2; i++) for (j=0; j<genislik+2; j++) depoTahta[i][j] = tahta[i][j];
+                int kacSatirDolu = 0;
                 for (i=1; i<=yukseklik; i++) {
                     for (j=1; j<=genislik; j++) if (tahta[i][j] != 1) break;
                     if (j<=genislik) continue; // Satır dolu değilse
+                    kacSatirDolu++;
                     if (i==1) {
                         for (j=1; j<=genislik; j++) tahta[i][j] = 0;
                         continue;
@@ -213,6 +236,10 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     }
                     
                 }
+                if (kacSatirDolu == 1) skorDegistir(100);
+                if (kacSatirDolu == 2) skorDegistir(300);
+                if (kacSatirDolu == 3) skorDegistir(500);
+                if (kacSatirDolu == 4) skorDegistir(800);
                 
                 // Değişiklikleri Görsel Olarak Göster
                 for (i=1; i<=yukseklik; i++)
