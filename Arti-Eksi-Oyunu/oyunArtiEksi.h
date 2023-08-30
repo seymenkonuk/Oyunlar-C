@@ -98,7 +98,7 @@ int oynaArtiEksiOyunu(bool zorMod) {
                 printf("Hatali deger girisi! Tekrar Deger Giriniz!\n");
                 printf("%d. Tahminin: ", adim);
             }
-            int cevap[2]; 
+            int cevap[2] = {4, 0}; 
             
             if (!zorMod)
                 cevapVer(kullaniciTahmini, bilgisayarinSayisi, cevap);
@@ -109,6 +109,7 @@ int oynaArtiEksiOyunu(bool zorMod) {
                     if (bilgisayarSayiPuan[i] == 0) continue;
                     int kCevap[2]; cevapVer(kullaniciTahmini, i, kCevap);
                     cevapPuan[kCevap[0]][kCevap[1]]++;
+                    if (kCevap[0] == 4) continue;
                     if (cevapPuan[kCevap[0]][kCevap[1]] > enFazlaPuan) {
                          enFazlaPuan = cevapPuan[kCevap[0]][kCevap[1]];
                          cevap[0] = kCevap[0];
