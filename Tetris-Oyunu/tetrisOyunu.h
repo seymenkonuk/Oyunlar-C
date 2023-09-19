@@ -22,10 +22,10 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
     
     // Tahtayı Oluşturma
     system("cls"); int i, j;
-    for (i=0; i<genislik+2; i++) printf("%c ", 254);
-    for (i=0; i<yukseklik+1; i++) printf("\n%c", 254);
-    for (i=0; i<genislik+1; i++) printf(" %c", 254);
-    for (i=1; i<yukseklik+1; i++) { gotoxy((genislik+1)*2, i); printf("%c", 254);}
+    for (i=0; i<genislik+2; i++) printf("%c%c", 219, 219);
+    for (i=0; i<yukseklik+1; i++) printf("\n%c%c", 219, 219);
+    for (i=0; i<genislik+1; i++) printf("%c%c", 219, 219);
+    for (i=1; i<yukseklik+1; i++) { gotoxy((genislik+1)*2, i); printf("%c%c", 219, 219);}
     
     // Bloklar[blok_ismi][yon][parca][x,y]
     int blokSayisi = 7;
@@ -107,7 +107,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
             printf("        ");
             for (j=0; j<4; j++) {
                 gotoxy((genislik+2)*2+4 + bloklar[gelecekBlok[i]][0][j][0]*2, 5+3*i + bloklar[gelecekBlok[i]][0][j][1]);
-                printf("%c", 254);
+                printf("%c%c", 219, 219);
             }
         }
         
@@ -146,7 +146,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     printf("        ");
                     for (i=0; i<4; i++) {
                         gotoxy((genislik+2)*2+4 + bloklar[yedekBlok][0][i][0]*2, 1 + bloklar[yedekBlok][0][i][1]);
-                        printf("%c", 254);
+                        printf("%c%c", 219, 219);
                     }
                 } else if (tus==32) { // Boşluk Tuşu, En Aşağı Gönder
                     ky = 1;
@@ -159,7 +159,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                 int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                 if (parca_y<=0) continue;
-                gotoxy(parca_x*2, parca_y); printf(" ");
+                gotoxy(parca_x*2, parca_y); printf("  ");
             }
             gotoxy(0, yukseklik+2);
             
@@ -192,7 +192,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                 int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                 if (parca_y<=0) continue;
-                gotoxy(parca_x*2, parca_y); printf("%c", 254);
+                gotoxy(parca_x*2, parca_y); printf("%c%c", 219, 219);
                 continue;
             }
             gotoxy(0, yukseklik+2);
@@ -246,10 +246,10 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     for (j=1; j<=genislik; j++)
                         if (tahta[i][j]==1 && depoTahta[i][j]==0) {
                             gotoxy(j*2, i);
-                            printf("%c", 254);
+                            printf("%c%c", 219, 219);
                         } else if (tahta[i][j]==0 && depoTahta[i][j]==1) {
                             gotoxy(j*2, i);
-                            printf(" ");
+                            printf("  ");
                         }
                 
                 // Oyun Hızlansın
@@ -284,7 +284,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                         int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                         int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                         if (parca_y<=0) continue;
-                        gotoxy(parca_x*2, parca_y); printf(" ");
+                        gotoxy(parca_x*2, parca_y); printf("  ");
                     }
                     gotoxy(0, yukseklik+2);
                     
@@ -294,7 +294,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                         int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                         int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                         if (parca_y<=0) continue;
-                        gotoxy(parca_x*2, parca_y); printf("%c", 254);
+                        gotoxy(parca_x*2, parca_y); printf("%c%c", 219, 219);
                         continue;
                     }
                     gotoxy(0, yukseklik+2);
