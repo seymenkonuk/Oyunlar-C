@@ -5,8 +5,9 @@ Tetris Oyunu
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
-#include "../lib/imlec.h" // https://github.com/seymenkonuk/Imlec-Kontrol-C commit 1
-#include "../lib/rastgele.h" // https://github.com/seymenkonuk/Rastgele-C commit 1
+#include "../lib/imlec.h" // https://github.com/seymenkonuk/Imlec-Kontrol-C
+#include "../lib/rastgele.h" // https://github.com/seymenkonuk/Rastgele-C
+#include "../lib/renk.h" // https://github.com/seymenkonuk/Yazi-Rengi-C
 
 int oynaTetrisOyunu(int genislik, int yukseklik);
 
@@ -16,11 +17,13 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
         puan += artis;
         // Ekranda Göster
         gotoxy((genislik+2)*2+2+6,14);
+        RenkDegistir(Sifirla);
         printf("%d", puan);
         gotoxy(0, yukseklik+2);
     }
     
     // Tahtayý Oluþturma
+    RenkDegistir(Sifirla);
     system("cls"); int i, j;
     for (i=0; i<genislik+2; i++) printf("%c%c", 219, 219);
     for (i=0; i<yukseklik+1; i++) printf("\n%c%c", 219, 219);
@@ -66,7 +69,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
             {{0,-1}, {-1,0}, {0,0}, {-1,1}}},  // Z 3 Kere Sola Dönmüþ
     };
     
-    // Tahtayý Oluþturma
+    // Tahta Dizisini Oluþturma
     int tahta[yukseklik+2][genislik+2];
     for (i=0; i<yukseklik+2; i++) 
         for (j=0; j<genislik+2; j++)
@@ -101,10 +104,14 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
         
         // Sýradaki Bloklarý Ekranda Göster
         for (i=0; i<3; i++) {
+            // Temizle
             gotoxy((genislik+2)*2+2, 5+3*i);
             printf("        ");
             gotoxy((genislik+2)*2+2, 6+3*i);
             printf("        ");
+            
+            // Bloklarý Çiz
+            RenkDegistir(Siyah + gelecekBlok[i]);
             for (j=0; j<4; j++) {
                 gotoxy((genislik+2)*2+4 + bloklar[gelecekBlok[i]][0][j][0]*2, 5+3*i + bloklar[gelecekBlok[i]][0][j][1]);
                 printf("%c%c", 219, 219);
@@ -139,11 +146,13 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     yedekBlok = yeniBlok;
                     yedeklendiMi = true;
                     
-                    // Yedek Bloðu Ekranda Göster
+                    // Yedek Bloðun Olduðu Yeri Temizle
                     gotoxy((genislik+2)*2+2, 1);
                     printf("        ");
                     gotoxy((genislik+2)*2+2, 2);
                     printf("        ");
+                    // Yedek Bloðu Ekranda Göster
+                    RenkDegistir(Siyah + yedekBlok);
                     for (i=0; i<4; i++) {
                         gotoxy((genislik+2)*2+4 + bloklar[yedekBlok][0][i][0]*2, 1 + bloklar[yedekBlok][0][i][1]);
                         printf("%c%c", 219, 219);
@@ -178,7 +187,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                     if (parca_x<=0) break; if (parca_x>=genislik+1) break;
                     if (parca_y<=0) continue;
-                    if (tahta[parca_y][parca_x] == 1) break;
+                    if (tahta[parca_y][parca_x] != 0) break;
                 }
                 if (i<4) { // Yapýlamazsa Geri Getir
                     merkezx -= kx; merkezy -= ky; yon = (yon - kyon+4)%4;
@@ -188,6 +197,7 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
             } while (boslukBasildiMi);
             
             // Yenisini Göster
+            RenkDegistir(Siyah + yeniBlok);
             for (i=0; i<4; i++) {
                 int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                 int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
@@ -204,10 +214,14 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                 int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
                 if (1+parca_y < 0) continue;
-                if (tahta[1+parca_y][parca_x] == 1) {
+                if (tahta[1+parca_y][parca_x] != 0) {
                     dustuMu = true;
                     degistirilebilirMi = true;
-                    if (parca_y <= 0) return puan;
+                    // Düþen Blok, Alanýn Üstünde, Oyun Bitti
+                    if (parca_y <= 0) {
+                        RenkDegistir(Sifirla);
+                        return puan;
+                    }
                 }
             }
             if (dustuMu) {
@@ -215,14 +229,14 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 for (i=0; i<4; i++) {
                     int parca_y = merkezy+bloklar[yeniBlok][yon][i][1];
                     int parca_x = merkezx+bloklar[yeniBlok][yon][i][0];
-                    tahta[parca_y][parca_x] = 1;
+                    tahta[parca_y][parca_x] = yeniBlok + 1;
                 }
                 
                 // SATIR DOLDUYSA SATIRI SÝL
                 int depoTahta[yukseklik+2][genislik+2]; for (i=0; i<yukseklik+2; i++) for (j=0; j<genislik+2; j++) depoTahta[i][j] = tahta[i][j];
                 int kacSatirDolu = 0;
                 for (i=1; i<=yukseklik; i++) {
-                    for (j=1; j<=genislik; j++) if (tahta[i][j] != 1) break;
+                    for (j=1; j<=genislik; j++) if (tahta[i][j] == 0) break;
                     if (j<=genislik) continue; // Satýr dolu deðilse
                     kacSatirDolu++;
                     if (i==1) {
@@ -244,10 +258,11 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                 // Deðiþiklikleri Görsel Olarak Göster
                 for (i=1; i<=yukseklik; i++)
                     for (j=1; j<=genislik; j++)
-                        if (tahta[i][j]==1 && depoTahta[i][j]==0) {
+                        if (tahta[i][j]!=0 && depoTahta[i][j]!=tahta[i][j]) {
+                            RenkDegistir(Siyah + tahta[i][j]-1);
                             gotoxy(j*2, i);
                             printf("%c%c", 219, 219);
-                        } else if (tahta[i][j]==0 && depoTahta[i][j]==1) {
+                        } else if (tahta[i][j]==0 && depoTahta[i][j]!=0) {
                             gotoxy(j*2, i);
                             printf("  ");
                         }
@@ -275,7 +290,10 @@ int oynaTetrisOyunu(int genislik, int yukseklik) {
                     if (tahta[1+parca_y][parca_x] == 1) {
                         dustuMu = true;
                         degistirilebilirMi = true;
-                        if (parca_y <= 0) return puan;
+                        if (parca_y <= 0) {
+                            RenkDegistir(Sifirla);
+                            return puan;
+                        }
                     }
                 }
                 if (!dustuMu) {
