@@ -10,9 +10,11 @@ Yılan Oyunu
 #include "../lib/imlec.h" // https://github.com/seymenkonuk/Imlec-Kontrol-C commit 1
 #include "../lib/rastgele.h" // https://github.com/seymenkonuk/Rastgele-C commit 1
 
-int oynaYilanOyunu(int genislik, int yukseklik, int elmaSayisi);
+// mod: 0 -> Yılan Duvara Çarparsa Ölür
+// mod: 1 -> Yılan Duvara Çarparsa Ters Tarafdan Çıkar
+int oynaYilanOyunu(int genislik, int yukseklik, int elmaSayisi, int mod);
 
-int oynaYilanOyunu(int genislik, int yukseklik, int elmaSayisi) {
+int oynaYilanOyunu(int genislik, int yukseklik, int elmaSayisi, int mod) {
     int yonler[4][2] = {{1,0}, {0,1}, {-1,0}, {0,-1}};
     system("cls"); int i, j;
     for (i=0; i<genislik+2; i++) printf("%c%c", 219, 219);
@@ -58,8 +60,16 @@ int oynaYilanOyunu(int genislik, int yukseklik, int elmaSayisi) {
         // Duvara Çarpma Kontrol
         int yeni_x = yilan[0][0] + yonler[yon][0];
         int yeni_y = yilan[0][1] + yonler[yon][1];
-        if (yeni_x < 1 || yeni_x > genislik) break;
-        if (yeni_y < 1 || yeni_y > yukseklik) break;
+        
+        if (mod == 0) {
+            if (yeni_x < 1 || yeni_x > genislik) break;
+            if (yeni_y < 1 || yeni_y > yukseklik) break;
+        } else {
+            if (yeni_x < 1) yeni_x = genislik;
+            if (yeni_x > genislik) yeni_x = 1;
+            if (yeni_y < 1) yeni_y = yukseklik;
+            if (yeni_y > yukseklik) yeni_y = 1;
+        }
         
         // Yılanı Kaydır
         if (tahta[yeni_y-1][yeni_x-1] == 1) break; // Kendine Çarptı
